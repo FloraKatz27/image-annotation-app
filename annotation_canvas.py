@@ -54,7 +54,7 @@ class AnnotationCanvas(QWidget):
             
     def mouseMoveEvent(self, event):
         
-        if (event.buttons() & Qt.MouseButton.LeftButton and self.last_point is not None):
+        if (event.buttons() & Qt.MouseButton.LeftButton and self.last_point is not None and self.current_tool == "freehand"):
             
             painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap   
             

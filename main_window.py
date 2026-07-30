@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox)
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup)
 from annotation_canvas import AnnotationCanvas
 
 
@@ -54,6 +54,27 @@ class MainWindow(QMainWindow):
         self.line_button = QPushButton("Line")
         self.rectangle_button = QPushButton("Rectangle")
         
+        #Allow each tool button to remain selected after it is clicked
+        self.freehand_button.setCheckable(True)
+        self.line_button.setCheckable(True)
+        self.rectangle_button.setCheckable(True)
+        
+        #Group the tool buttons so that only one can be selected at a time
+        self.tool_button_group = QButtonGroup(self)
+        self.tool_button_group.addButton(self.freehand_button)
+        self.tool_button_group.addButton(self.line_button)
+        self.tool_button_group.addButton(self.rectangle_button)
+        
+        self.tool_button_group.setExclusive(True)  # Ensure only one button can be selected at a time
+        
+        #Freehand is the default tool, so select it when the application starts
+        self.freehand_button.setChecked(True)
+        
+        #Connect each tool button to a method that updates the current tool in the canvas
+        self.freehand_button.clicked.connect(self.select_freehand_tool)
+        self.line_button.clicked.connect(self.select_line_tool)
+        self.rectangle_button.clicked.connect(self.select_rectangle_tool)
+
         #Add the tool buttons to the control panel
         control_layout.addWidget(self.freehand_button)
         control_layout.addWidget(self.line_button)
@@ -111,5 +132,18 @@ class MainWindow(QMainWindow):
         
         #Place the complete interface inside the main window
         self.setCentralWidget(central_widget)
+        
+    def select_freehand_tool(self):
+        """Set the current tool in the canvas to freehand drawing."""
+        self.canvas.current_tool = "freehand"
+        
+    def select_line_tool(self):
+        """Set the current tool in the canvas to line drawing."""
+        self.canvas.current_tool = "line"
+        
+    def select_rectangle_tool(self):
+        """Set the current tool in the canvas to rectangle drawing."""
+        self.canvas.current_tool = "rectangle"
+                
         
         
