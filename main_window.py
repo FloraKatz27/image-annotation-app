@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel)
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox)
 from annotation_canvas import AnnotationCanvas
 
 
@@ -58,6 +58,43 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(self.freehand_button)
         control_layout.addWidget(self.line_button)
         control_layout.addWidget(self.rectangle_button)
+        
+        #Add spacing before the brush settings section
+        control_layout.addSpacing(20)
+        
+        #Create the heading for the brush controls
+        brush_label = QLabel("Brush Settings")
+        control_layout.addWidget(brush_label)
+        
+        #Create a clearly labelled brush color control
+        color_label = QLabel("Brush Color:")
+        control_layout.addWidget(color_label)
+        
+        self.color_button = QPushButton("Black")
+        control_layout.addWidget(self.color_button)
+        
+        #Create a label for the brush size control
+        size_label = QLabel("Brush Size:")
+        control_layout.addWidget(size_label)
+        
+        #Allow the user to select a brush size in pixels from 1 to 20, with a default of 5
+        self.brush_size_spinbox = QSpinBox()
+        self.brush_size_spinbox.setRange(1, 50)
+        self.brush_size_spinbox.setValue(5)
+        self.brush_size_spinbox.setSuffix(" px")
+        
+        control_layout.addWidget(self.brush_size_spinbox)
+        
+        #Create a label for the brush style control
+        style_label = QLabel("Brush Style:")
+        control_layout.addWidget(style_label)
+        
+        #Provide the required solid and dashed brush styles
+        self.brush_style_combo = QComboBox()
+        self.brush_style_combo.addItems(["Solid", "Dashed"])
+        
+        control_layout.addWidget(self.brush_style_combo)
+        
         
         #Push the controls to the top of the panel
         control_layout.addStretch()
