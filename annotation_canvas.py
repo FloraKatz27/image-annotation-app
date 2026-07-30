@@ -23,6 +23,8 @@ class AnnotationCanvas(QWidget):
         
         self.current_tool = "freehand"  # Default tool is freehand drawing
         
+        self.brush_size = 5  # Default brush size for freehand drawing
+        
         self.last_point = None  # Store the last point for freehand drawing
         
         self.start_point = None  # Store the starting point for line and rectangle tools
@@ -50,7 +52,7 @@ class AnnotationCanvas(QWidget):
         
         #Draw the preview of the line or rectangle if the user is currently drawing one
         if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
-            pen = QPen(Qt.GlobalColor.black, 2, Qt.PenStyle.DashLine)  # Create a dashed line pen
+            pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.DashLine)  # Create a dashed line pen
             painter.setPen(pen)  # Set the pen for drawing
             painter.drawLine(self.start_point, self.end_point)  # Draw the line preview
     
@@ -75,7 +77,7 @@ class AnnotationCanvas(QWidget):
             
             painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap   
             
-            pen = QPen(Qt.GlobalColor.black, 5, Qt.PenStyle.SolidLine)
+            pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.SolidLine)
             
             painter.setPen(pen)  # Set the pen for drawing  
             
@@ -95,7 +97,7 @@ class AnnotationCanvas(QWidget):
             if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
                 painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
                 
-                pen = QPen(Qt.GlobalColor.black, 5, Qt.PenStyle.SolidLine)  # Create a solid line pen
+                pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.SolidLine)  # Create a solid line pen
                 
                 painter.setPen(pen)  # Set the pen for drawing
                 

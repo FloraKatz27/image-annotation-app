@@ -104,6 +104,8 @@ class MainWindow(QMainWindow):
         self.brush_size_spinbox.setValue(5)
         self.brush_size_spinbox.setSuffix(" px")
         
+        self.brush_size_spinbox.valueChanged.connect(self.update_brush_size)
+        
         control_layout.addWidget(self.brush_size_spinbox)
         
         #Create a label for the brush style control
@@ -144,6 +146,10 @@ class MainWindow(QMainWindow):
     def select_rectangle_tool(self):
         """Set the current tool in the canvas to rectangle drawing."""
         self.canvas.current_tool = "rectangle"
+        
+    def update_brush_size(self, size):
+        """Update the brush size in the canvas based on the spinbox value."""
+        self.canvas.brush_size = size    
                 
         
         
