@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QColor, QPainter, QPixmap, QPen
-from PyQt6.QtCore import Qt, QPoint, QRect
+from PyQt6.QtCore import Qt, QRect
 from PyQt6.QtWidgets import QWidget
 
 class AnnotationCanvas(QWidget):
@@ -24,6 +24,8 @@ class AnnotationCanvas(QWidget):
         self.current_tool = "freehand"  # Default tool is freehand drawing
         
         self.brush_size = 5  # Default brush size for freehand drawing
+        
+        self.brush_style = Qt.PenStyle.SolidLine  # Default brush style for freehand drawing
         
         self.last_point = None  # Store the last point for freehand drawing
         
@@ -50,7 +52,7 @@ class AnnotationCanvas(QWidget):
         
         #Draw a temporary preview while the user is dragging the mouse to create a line or rectangle
         if (self.current_tool in ["line", "rectangle"] and self.start_point is not None and self.end_point is not None):
-            preview_pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.DashLine)  # Create a dashed line pen
+            preview_pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.DashLine)  # Create a pen with the current brush size and style   
             painter.setPen(preview_pen)  # Set the pen for drawing
             
             
@@ -85,11 +87,13 @@ class AnnotationCanvas(QWidget):
             
             painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap   
             
-            pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.SolidLine)
+            pen = QPen(Qt.GlobalColor.black, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style   
             
             painter.setPen(pen)  # Set the pen for drawing  
             
             painter.drawLine(self.last_point, event.pos())  # Draw a line from the last point to the current mouse position
+            
+            painter.end()  # End the painting operation 
             
             self.last_point = event.pos()  # Update the last point to the current position  
             
@@ -108,7 +112,7 @@ class AnnotationCanvas(QWidget):
             if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
                 painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
                 
-                pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.SolidLine)  # Create a solid line pen
+                pen = QPen(Qt.GlobalColor.black, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style   
                 
                 painter.setPen(pen)  # Set the pen for drawing
                 
@@ -120,7 +124,7 @@ class AnnotationCanvas(QWidget):
             elif (self.current_tool == "rectangle" and self.start_point is not None and self.end_point is not None):
                 painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
                 
-                pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.SolidLine)  # Create a solid line pen
+                pen = QPen(Qt.GlobalColor.black, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style 
                 
                 painter.setPen(pen)  # Set the pen for drawing
                 
@@ -130,7 +134,7 @@ class AnnotationCanvas(QWidget):
                 
                 painter.end()  # End the painting operation
 
-            #Reset the points after drawing the line
+            #Reset the points after the drawing action finishes
             self.last_point = None
             self.start_point = None
             self.end_point = None

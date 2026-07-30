@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup)
 from annotation_canvas import AnnotationCanvas
+from PyQt6.QtCore import Qt
 
 
 class MainWindow(QMainWindow):
@@ -116,6 +117,8 @@ class MainWindow(QMainWindow):
         self.brush_style_combo = QComboBox()
         self.brush_style_combo.addItems(["Solid", "Dashed"])
         
+        self.brush_style_combo.currentIndexChanged.connect(self.update_brush_style) 
+        
         control_layout.addWidget(self.brush_style_combo)
         
         
@@ -149,7 +152,14 @@ class MainWindow(QMainWindow):
         
     def update_brush_size(self, size):
         """Update the brush size in the canvas based on the spinbox value."""
-        self.canvas.brush_size = size    
+        self.canvas.brush_size = size  
+        
+    def update_brush_style(self, style_name):
+        """Update the brush style in the canvas based on the combobox selection."""
+        if style_name == "Solid":
+            self.canvas.brush_style = Qt.PenStyle.SolidLine
+        elif style_name == "Dashed":
+            self.canvas.brush_style = Qt.PenStyle.DashLine      
                 
         
         
