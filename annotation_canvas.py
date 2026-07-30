@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QColor, QPainter, QPixmap, QPen
-from PyQt6.QtCore import Qt, QPoint
+from PyQt6.QtCore import Qt, QPoint, QRect
 from PyQt6.QtWidgets import QWidget
 
 class AnnotationCanvas(QWidget):
@@ -39,9 +39,7 @@ class AnnotationCanvas(QWidget):
         
         
     def paintEvent(self, event):
-        """Handle the painting of the canvas."""
-        
-        """Paint the canvas whenever Qt requests an update. Parameter: event(QPaintEvent): Contains information about the area of the widget that needs to be repainted."""
+        """Paint the permanent canvas and any temporary shape preview."""
         
         
         #Create a painter that draws onto this widget
@@ -50,11 +48,21 @@ class AnnotationCanvas(QWidget):
         painter.drawPixmap(0, 0, self.canvas)  # Draw the pixmap onto the widget    
         
         
-        #Draw the preview of the line or rectangle if the user is currently drawing one
-        if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
-            pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.DashLine)  # Create a dashed line pen
-            painter.setPen(pen)  # Set the pen for drawing
-            painter.drawLine(self.start_point, self.end_point)  # Draw the line preview
+        #Draw a temporary preview while the user is dragging the mouse to create a line or rectangle
+        if (self.current_tool in ["line", "rectangle"] and self.start_point is not None and self.end_point is not None):
+            preview_pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.DashLine)  # Create a dashed line pen
+            painter.setPen(preview_pen)  # Set the pen for drawing
+            
+            
+            #Draw a straight-line preview
+            if self.current_tool == "line":
+                painter.drawLine(self.start_point, self.end_point)
+                
+            #Draw a rectangle preview
+            elif self.current_tool == "rectangle":
+                preview_rectangle = QRect(self.start_point, self.end_point).normalized()  # Create a rectangle from the start and end points
+                
+                painter.drawRect(preview_rectangle)  # Draw the rectangle onto the widget
     
     def mousePressEvent(self, event):
         """Handle mouse press events for starting annotations."""
@@ -68,7 +76,7 @@ class AnnotationCanvas(QWidget):
             
     def mouseMoveEvent(self, event):
         
-        if (self.current_tool == "line" and event.buttons() & Qt.MouseButton.LeftButton and self.start_point is not None):
+        if (self.current_tool in ["line", "rectangle"] and event.buttons() & Qt.MouseButton.LeftButton and self.start_point is not None):
             self.end_point = event.pos()  # Update the ending point as the mouse moves
             
             self.update()  # Request a repaint of the widget
@@ -93,7 +101,10 @@ class AnnotationCanvas(QWidget):
         
         if event.button() == Qt.MouseButton.LeftButton:
             
-            #Permanently draw the line onto the canvas if the line tool is selected
+            #Use the exact position where the mouse was released
+            self.end_point = event.pos()
+            
+            #Permanently draw the line onto the canvas if the corresponding tool is selected
             if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
                 painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
                 
@@ -103,11 +114,27 @@ class AnnotationCanvas(QWidget):
                 
                 painter.drawLine(self.start_point, self.end_point)  # Draw the line onto the pixmap
                 
-                #Reset the points after drawing the line
-                self.last_point = None
-                self.start_point = None
-                self.end_point = None
+                painter.end()  # End the painting operation
                 
-                #Refresh the canvas
-                self.update()
+            #Permanently draw the rectangle onto the canvas if the rectangle tool is selected
+            elif (self.current_tool == "rectangle" and self.start_point is not None and self.end_point is not None):
+                painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
+                
+                pen = QPen(Qt.GlobalColor.black, self.brush_size, Qt.PenStyle.SolidLine)  # Create a solid line pen
+                
+                painter.setPen(pen)  # Set the pen for drawing
+                
+                final_rectangle = QRect(self.start_point, self.end_point).normalized()  # Create a rectangle from the start and end points
+                
+                painter.drawRect(final_rectangle)  # Draw the rectangle onto the pixmap
+                
+                painter.end()  # End the painting operation
+
+            #Reset the points after drawing the line
+            self.last_point = None
+            self.start_point = None
+            self.end_point = None
+                
+            #Refresh the canvas
+            self.update()
             
