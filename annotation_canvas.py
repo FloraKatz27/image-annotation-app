@@ -23,7 +23,10 @@ class AnnotationCanvas(QWidget):
         
         self.current_tool = "freehand"  # Default tool is freehand drawing
         
-        self.last_point = None  # Store the last point for freehand drawing 
+        self.last_point = None  # Store the last point for freehand drawing
+        
+        self.start_point = None  # Store the starting point for line and rectangle tools
+        self.end_point = None  # Store the ending point for line and rectangle tools 
         
         self.canvas = QPixmap(1000, 700)  # Create a pixmap to draw on
         self.canvas.fill(Qt.GlobalColor.white)  # Fill the pixmap with white color
@@ -44,6 +47,12 @@ class AnnotationCanvas(QWidget):
         
         painter.drawPixmap(0, 0, self.canvas)  # Draw the pixmap onto the widget    
         
+        
+        #Draw the preview of the line or rectangle if the user is currently drawing one
+        if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
+            pen = QPen(Qt.GlobalColor.black, 2, Qt.PenStyle.DashLine)  # Create a dashed line pen
+            painter.setPen(pen)  # Set the pen for drawing
+            painter.drawLine(self.start_point, self.end_point)  # Draw the line preview
     
     def mousePressEvent(self, event):
         """Handle mouse press events for starting annotations."""
@@ -51,8 +60,16 @@ class AnnotationCanvas(QWidget):
         if event.button() == Qt.MouseButton.LeftButton:
             self.last_point = event.pos()  # Store the position where the mouse was pressed
             
+            self.start_point = event.pos()  # Store the starting point for line and rectangle tools 
+            self.end_point = event.pos()  # Initialize the ending point to the starting point   
+            
             
     def mouseMoveEvent(self, event):
+        
+        if (self.current_tool == "line" and event.buttons() & Qt.MouseButton.LeftButton and self.start_point is not None):
+            self.end_point = event.pos()  # Update the ending point as the mouse moves
+            
+            self.update()  # Request a repaint of the widget
         
         if (event.buttons() & Qt.MouseButton.LeftButton and self.last_point is not None and self.current_tool == "freehand"):
             
@@ -73,5 +90,22 @@ class AnnotationCanvas(QWidget):
         """Handle mouse release events to finish annotations."""
         
         if event.button() == Qt.MouseButton.LeftButton:
-            self.last_point = None  # Reset the last point when the mouse button is released
+            
+            #Permanently draw the line onto the canvas if the line tool is selected
+            if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
+                painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
+                
+                pen = QPen(Qt.GlobalColor.black, 5, Qt.PenStyle.SolidLine)  # Create a solid line pen
+                
+                painter.setPen(pen)  # Set the pen for drawing
+                
+                painter.drawLine(self.start_point, self.end_point)  # Draw the line onto the pixmap
+                
+                #Reset the points after drawing the line
+                self.last_point = None
+                self.start_point = None
+                self.end_point = None
+                
+                #Refresh the canvas
+                self.update()
             
