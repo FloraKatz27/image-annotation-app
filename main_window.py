@@ -117,7 +117,7 @@ class MainWindow(QMainWindow):
         self.brush_style_combo = QComboBox()
         self.brush_style_combo.addItems(["Solid", "Dashed"])
         
-        self.brush_style_combo.currentIndexChanged.connect(self.update_brush_style) 
+        self.brush_style_combo.currentTextChanged.connect(self.update_brush_style) 
         
         control_layout.addWidget(self.brush_style_combo)
         
