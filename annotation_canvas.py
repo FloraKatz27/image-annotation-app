@@ -27,7 +27,7 @@ class AnnotationCanvas(QWidget):
         
         self.brush_style = Qt.PenStyle.SolidLine  # Default brush style for freehand drawing
         
-        self.brush_color = Qt.GlobalColor.black   # Default brush color for freehand drawing     
+        self.brush_color = QColor("black")   # Default brush color for freehand drawing     
         
         
         self.last_point = None  # Store the last point for freehand drawing

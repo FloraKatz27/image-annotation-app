@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup, QColorDialog)
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup, QColorDialog, QFileDialog)
 from annotation_canvas import AnnotationCanvas
 from PyQt6.QtCore import Qt
 
@@ -84,10 +84,18 @@ class MainWindow(QMainWindow):
         #Create a button to clear the canvas and connect it to the canvas's clear method
         self.clear_button = QPushButton("Clear Canvas")
         
-        #Connet the button to the canvas-clearing method
+        #Connect the button to the canvas-clearing method
         self.clear_button.clicked.connect(self.clear_canvas)
         
         control_layout.addWidget(self.clear_button)
+        
+        #Create a button that lets the user choose where to save the canvas
+        self.save_as_button = QPushButton("Save As")
+        
+        #Connect the button to the save method
+        self.save_as_button.clicked.connect(self.save_canvas_as)
+        
+        control_layout.addWidget(self.save_as_button)
         
         #Add spacing before the brush settings section
         control_layout.addSpacing(20)
@@ -149,28 +157,40 @@ class MainWindow(QMainWindow):
         #Place the complete interface inside the main window
         self.setCentralWidget(central_widget)
         
+        #Create the status bar at the bottom of the window
+        self.statusBar()
+        
+        #Display the initial application state
+        self.update_status_bar()
+        
     def select_freehand_tool(self):
         """Set the current tool in the canvas to freehand drawing."""
         self.canvas.current_tool = "freehand"
+        self.update_status_bar()  # Update the status bar to reflect the current tool
         
     def select_line_tool(self):
         """Set the current tool in the canvas to line drawing."""
         self.canvas.current_tool = "line"
+        self.update_status_bar()  # Update the status bar to reflect the current tool
         
     def select_rectangle_tool(self):
         """Set the current tool in the canvas to rectangle drawing."""
         self.canvas.current_tool = "rectangle"
-        
+        self.update_status_bar()  # Update the status bar to reflect the current tool
+
     def update_brush_size(self, size):
         """Update the brush size in the canvas based on the spinbox value."""
-        self.canvas.brush_size = size  
+        self.canvas.brush_size = size
+        self.update_status_bar()  # Update the status bar to reflect the current brush size   
         
     def update_brush_style(self, style_name):
         """Update the brush style in the canvas based on the combobox selection."""
         if style_name == "Solid":
             self.canvas.brush_style = Qt.PenStyle.SolidLine
         elif style_name == "Dashed":
-            self.canvas.brush_style = Qt.PenStyle.DashLine      
+            self.canvas.brush_style = Qt.PenStyle.DashLine 
+            
+        self.update_status_bar()  # Update the status bar to reflect the current brush style     
                 
     
     def choose_brush_color(self):
@@ -178,6 +198,7 @@ class MainWindow(QMainWindow):
         color = QColorDialog.getColor(self.canvas.brush_color, self, "Choose Brush Color")
         if color.isValid():
             self.canvas.brush_color = color
+            self.update_status_bar()  # Update the status bar to reflect the current brush color
             self.color_button.setText(color.name())  # Update the button text to show the selected color
             self.color_button.setStyleSheet(f"background-color: {color.name()}; color: white;")  # Change button background to selected color
             
@@ -185,3 +206,19 @@ class MainWindow(QMainWindow):
     def clear_canvas(self):
         """Clear all annotations from the canvas."""
         self.canvas.clear_canvas()
+        
+    def save_canvas_as(self):
+        """Open a file dialog to allow the user to save the canvas as an image file."""
+        file_path, selected_filter = QFileDialog.getSaveFileName(self, "Save Annotated Image", "", "PNG Files (*.png);;JPEG Files (*.jpg *.jpeg)")
+        
+        if file_path:
+            self.canvas.canvas.save(file_path)  # Save the canvas pixmap to the selected file path 
+        
+        
+    def update_status_bar(self):
+        """Update the status bar with the current tool and brush settings."""
+        
+        message = (f"Tool: {self.canvas.current_tool.capitalize()} | " f"Color: {self.canvas.brush_color.name()} | " f"Size: {self.canvas.brush_size} px")
+        
+        self.statusBar().showMessage(message)
+        
