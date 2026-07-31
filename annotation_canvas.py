@@ -193,3 +193,24 @@ class AnnotationCanvas(QWidget):
         if self.history:  # Check if there is a previous state to revert to
             self.canvas = self.history.pop()  # Restore the last saved state from history
             self.update()  # Refresh the widget to display the restored canvas
+            
+            
+    def new_canvas(self):
+        """Create a new blank canvas for annotations."""
+        
+        #Save the current state of the canvas for undo functionality
+        self.save_state()
+        
+        #Create a fresh blank pixmap for the new canvas
+        self.canvas = QPixmap(1000, 700)
+        
+        #Fill the new pixmap with the background color
+        self.canvas.fill(self.background_color)
+        
+        #Reset temporary drawing points
+        self.last_point = None
+        self.start_point = None
+        self.end_point = None
+        
+        #Refresh the widget to display the new blank canvas
+        self.update()

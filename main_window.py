@@ -15,6 +15,10 @@ class MainWindow(QMainWindow):
         """Initialise and configure the main application window."""
 
         super().__init__()
+        
+        #Store the path currently used by Save
+        #None means the user has not yet saved the canvas to a file
+        self.current_save_path = None
 
         # Set the text displayed in the title bar.
         self.setWindowTitle("Image Annotation Application")
@@ -46,8 +50,47 @@ class MainWindow(QMainWindow):
         #Arrange the controls vertically inside the panel
         control_layout = QVBoxLayout(control_panel)
         
+        #Create the heading for document-related actions
+        file_label = QLabel("File Actions")
+        control_layout.addWidget(file_label)
+        
+        #Create a New Canvas button and connect it 
+        self.new_canvas_button = QPushButton("New Canvas")
+                
+        #Connect it to the new canvas method
+        self.new_canvas_button.clicked.connect(self.new_canvas)
+                
+        control_layout.addWidget(self.new_canvas_button)
+        
+        #Create a button for opening an image file and connecting it to the canvas's load method
+        self.open_image_button = QPushButton("Open Image")
+                
+        #Connect the button to the canvas's load method
+        self.open_image_button.clicked.connect(self.open_image)
+                
+        control_layout.addWidget(self.open_image_button)
+        
+        #Create a button that saves to the current file path
+        self.save_button = QPushButton("Save")
+        
+        #Connect the button to the save method
+        self.save_button.clicked.connect(self.save_canvas)
+        
+        control_layout.addWidget(self.save_button)
+        
+        #Create a button that lets the user choose where to save the canvas
+        self.save_as_button = QPushButton("Save As")
+                
+        #Connect the button to the save method
+        self.save_as_button.clicked.connect(self.save_canvas_as)
+                
+        control_layout.addWidget(self.save_as_button)
+        
+        #Add visual separation before the annotation tools
+        control_layout.addSpacing(15)
+        
         #Create the tools heading
-        tool_label = QLabel("Tools")
+        tool_label = QLabel("Annotation Tools")
         control_layout.addWidget(tool_label)
         
         #Create the annotation tool buttons
@@ -81,37 +124,28 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(self.line_button)
         control_layout.addWidget(self.rectangle_button)
         
+        #Add visual separation before the canvas control buttons
+        control_layout.addSpacing(15)
+        
+        #Create the editing controls heading
+        editing_label = QLabel("Editing Controls")
+        control_layout.addWidget(editing_label)
+        
+        #Create the Undo button and connect it to the canvas's undo method
+        self.undo_button = QPushButton("Undo")
+                
+        #Connect it to the undo method
+        self.undo_button.clicked.connect(self.undo)
+                
+        control_layout.addWidget(self.undo_button)
+        
         #Create a button to clear the canvas and connect it to the canvas's clear method
         self.clear_button = QPushButton("Clear Canvas")
         
         #Connect the button to the canvas-clearing method
         self.clear_button.clicked.connect(self.clear_canvas)
         
-        control_layout.addWidget(self.clear_button)
-        
-        #Create the Undo button and connect it to the canvas's undo method
-        self.undo_button = QPushButton("Undo")
-        
-        #Connect it to the undo method
-        self.undo_button.clicked.connect(self.undo)
-        
-        control_layout.addWidget(self.undo_button)
-        
-        #Create a button for opening an image file and connecting it to the canvas's load method
-        self.open_image_button = QPushButton("Open Image")
-        
-        #Connect the button to the canvas's load method
-        self.open_image_button.clicked.connect(self.open_image)
-        
-        control_layout.addWidget(self.open_image_button)
-        
-        #Create a button that lets the user choose where to save the canvas
-        self.save_as_button = QPushButton("Save As")
-        
-        #Connect the button to the save method
-        self.save_as_button.clicked.connect(self.save_canvas_as)
-        
-        control_layout.addWidget(self.save_as_button)
+        control_layout.addWidget(self.clear_button)     
         
         #Add spacing before the brush settings section
         control_layout.addSpacing(20)
@@ -225,7 +259,15 @@ class MainWindow(QMainWindow):
         
     def undo(self):
         """Undo the last annotation action on the canvas."""
-        self.canvas.undo()    
+        self.canvas.undo()
+        
+    def new_canvas(self):
+        """Create a new blank canvas for annotations."""
+        self.canvas.new_canvas()
+        #A new document does not yet have a save location, so reset the current save path
+        self.current_save_path = None
+        
+        self.statusBar().showMessage("New canvas created.", 5000)  # Show message for 5 seconds      
         
     def open_image(self):
         """Open a file dialog to allow the user to select an image file to load onto the canvas."""
@@ -233,6 +275,10 @@ class MainWindow(QMainWindow):
         
         if file_path:
             self.canvas.load_image(file_path)  # Load the selected image onto the canvas
+            
+            #Require Save As before exporting over a chosen path
+            self.current_save_path = None
+            
             self.statusBar().showMessage(f"Image opened from: {file_path}", 5000)  # Update the status bar to reflect the current state of the canvas
         
     def save_canvas_as(self):
@@ -240,12 +286,30 @@ class MainWindow(QMainWindow):
         file_path, selected_filter = QFileDialog.getSaveFileName(self, "Save Annotated Image", "", "PNG Files (*.png);;JPEG Files (*.jpg *.jpeg)")
         
         if file_path:
+            #Remember this path for future Save operations
+            self.current_save_path = file_path
+            
             #Determine the file format based on the selected filter
             success = self.canvas.canvas.save(file_path)
             
             if success:
                 self.statusBar().showMessage(f"Image saved to {file_path}", 5000)  # Show message for 5 seconds        
+
+    def save_canvas(self):
+        """Save the image using the current save path if it exists"""
+        #If no location has been chosen, use Save As first
+        if self.current_save_path is None:
+            self.save_canvas_as()
+            return  # Exit the method after saving with Save As
         
+        success = self.canvas.canvas.save(self.current_save_path)
+        
+        if success:
+            self.statusBar().showMessage(f"Image saved to {self.current_save_path}", 5000)  # Show message for 5 seconds
+        else:
+            self.statusBar().showMessage("Failed to save image.", 5000)  # Show message for 5 seconds
+    
+            
     def update_status_bar(self):
         """Update the status bar with the current tool and brush settings."""
         
