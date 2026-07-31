@@ -267,7 +267,9 @@ class MainWindow(QMainWindow):
         #A new document does not yet have a save location, so reset the current save path
         self.current_save_path = None
         
-        self.statusBar().showMessage("New canvas created.", 5000)  # Show message for 5 seconds      
+        self.statusBar().showMessage("New canvas created.", 5000)  # Show message for 5 seconds     
+        
+        self.update_status_bar()  # Update the status bar to reflect the current state of the canvas 
         
     def open_image(self):
         """Open a file dialog to allow the user to select an image file to load onto the canvas."""
@@ -280,6 +282,8 @@ class MainWindow(QMainWindow):
             self.current_save_path = None
             
             self.statusBar().showMessage(f"Image opened from: {file_path}", 5000)  # Update the status bar to reflect the current state of the canvas
+            
+            self.update_status_bar()  # Update the status bar to reflect the current state of the canvas    
         
     def save_canvas_as(self):
         """Open a file dialog to allow the user to save the canvas as an image file."""
@@ -312,8 +316,11 @@ class MainWindow(QMainWindow):
             
     def update_status_bar(self):
         """Update the status bar with the current tool and brush settings."""
-        
-        message = (f"Tool: {self.canvas.current_tool.capitalize()} | " f"Color: {self.canvas.brush_color.name()} | " f"Size: {self.canvas.brush_size} px")
+ 
+        image_width = self.canvas.canvas.width()
+        image_height = self.canvas.canvas.height()
+       
+        message = (f"Tool: {self.canvas.current_tool.capitalize()} | " f"Color: {self.canvas.brush_color.name()} | " f"Size: {self.canvas.brush_size} px | " f"Image: {image_width} x {image_height}")
         
         self.statusBar().showMessage(message)
         
