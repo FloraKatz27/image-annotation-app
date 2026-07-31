@@ -81,6 +81,14 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(self.line_button)
         control_layout.addWidget(self.rectangle_button)
         
+        #Create a button to clear the canvas and connect it to the canvas's clear method
+        self.clear_button = QPushButton("Clear Canvas")
+        
+        #Connet the button to the canvas-clearing method
+        self.clear_button.clicked.connect(self.clear_canvas)
+        
+        control_layout.addWidget(self.clear_button)
+        
         #Add spacing before the brush settings section
         control_layout.addSpacing(20)
         
@@ -170,5 +178,10 @@ class MainWindow(QMainWindow):
         color = QColorDialog.getColor(self.canvas.brush_color, self, "Choose Brush Color")
         if color.isValid():
             self.canvas.brush_color = color
-            self.color_button.setText(color.name())  # Update the button text to show the selected color    
-        
+            self.color_button.setText(color.name())  # Update the button text to show the selected color
+            self.color_button.setStyleSheet(f"background-color: {color.name()}; color: white;")  # Change button background to selected color
+            
+            
+    def clear_canvas(self):
+        """Clear all annotations from the canvas."""
+        self.canvas.clear_canvas()

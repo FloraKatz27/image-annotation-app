@@ -145,3 +145,18 @@ class AnnotationCanvas(QWidget):
             #Refresh the canvas
             self.update()
             
+    def clear_canvas(self):
+        """Remove all drawings from the canvas"""
+        
+        #Fill the pixmap with the background color to clear it
+        self.canvas.fill(Qt.GlobalColor.white)
+        
+        #Remove any temporary drawing points
+        self.last_point = None
+        self.start_point = None
+        self.end_point = None
+        
+        #Refresh the widget
+        self.update()
+        
+            
