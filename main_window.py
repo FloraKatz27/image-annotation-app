@@ -212,8 +212,11 @@ class MainWindow(QMainWindow):
         file_path, selected_filter = QFileDialog.getSaveFileName(self, "Save Annotated Image", "", "PNG Files (*.png);;JPEG Files (*.jpg *.jpeg)")
         
         if file_path:
-            self.canvas.canvas.save(file_path)  # Save the canvas pixmap to the selected file path 
-        
+            #Determine the file format based on the selected filter
+            success = self.canvas.canvas.save(file_path)
+            
+            if success:
+                self.statusBar().showMessage(f"Image saved to {file_path}", 5000)  # Show message for 5 seconds        
         
     def update_status_bar(self):
         """Update the status bar with the current tool and brush settings."""
