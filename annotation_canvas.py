@@ -38,6 +38,10 @@ class AnnotationCanvas(QWidget):
         self.canvas = QPixmap(1000, 700)  # Create a pixmap to draw on
         self.canvas.fill(Qt.GlobalColor.white)  # Fill the pixmap with white color
         
+        #Store previous versions of the canvas for undo functionality
+        self.history = []  # List to store previous versions of the canvas for undo functionality
+        
+        
         #Add a visible border around the canvas
         self.setStyleSheet("""AnnotationCanvas {border: 2px solid #666666;}""")
 
@@ -73,6 +77,8 @@ class AnnotationCanvas(QWidget):
         """Handle mouse press events for starting annotations."""
         
         if event.button() == Qt.MouseButton.LeftButton:
+            self.save_state()  # Save the current state of the canvas for undo functionality
+            
             self.last_point = event.pos()  # Store the position where the mouse was pressed
             
             self.start_point = event.pos()  # Store the starting point for line and rectangle tools 
@@ -148,8 +154,11 @@ class AnnotationCanvas(QWidget):
     def clear_canvas(self):
         """Remove all drawings from the canvas"""
         
+        #Save the current state of the canvas for undo functionality
+        self.save_state()
+        
         #Fill the pixmap with the background color to clear it
-        self.canvas.fill(Qt.GlobalColor.white)
+        self.canvas.fill(self.background_color)
         
         #Remove any temporary drawing points
         self.last_point = None
@@ -165,7 +174,22 @@ class AnnotationCanvas(QWidget):
         loaded_image = QPixmap(file_path)  # Load the image into a QPixmap
         
         if not loaded_image.isNull():  # Check if the image was loaded successfully
+            
+            #Save the current canvas before replacing it with the new image for undo functionality
+            self.save_state()
+            
             self.canvas = loaded_image.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)  # Scale the image to fit the canvas while maintaining aspect ratio
             self.update()  # Refresh the widget to display the loaded image
         
-            
+    
+    def save_state(self):
+        """Save the current state of the canvas for undo functionality."""
+        self.history.append(self.canvas.copy())  # Store a copy of the current canvas in history
+        
+        
+    def undo(self):
+        """Undo the last annotation action on the canvas."""
+        
+        if self.history:  # Check if there is a previous state to revert to
+            self.canvas = self.history.pop()  # Restore the last saved state from history
+            self.update()  # Refresh the widget to display the restored canvas

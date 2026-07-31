@@ -89,6 +89,14 @@ class MainWindow(QMainWindow):
         
         control_layout.addWidget(self.clear_button)
         
+        #Create the Undo button and connect it to the canvas's undo method
+        self.undo_button = QPushButton("Undo")
+        
+        #Connect it to the undo method
+        self.undo_button.clicked.connect(self.undo)
+        
+        control_layout.addWidget(self.undo_button)
+        
         #Create a button for opening an image file and connecting it to the canvas's load method
         self.open_image_button = QPushButton("Open Image")
         
@@ -214,6 +222,10 @@ class MainWindow(QMainWindow):
     def clear_canvas(self):
         """Clear all annotations from the canvas."""
         self.canvas.clear_canvas()
+        
+    def undo(self):
+        """Undo the last annotation action on the canvas."""
+        self.canvas.undo()    
         
     def open_image(self):
         """Open a file dialog to allow the user to select an image file to load onto the canvas."""
