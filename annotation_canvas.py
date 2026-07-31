@@ -27,6 +27,9 @@ class AnnotationCanvas(QWidget):
         
         self.brush_style = Qt.PenStyle.SolidLine  # Default brush style for freehand drawing
         
+        self.brush_color = Qt.GlobalColor.black   # Default brush color for freehand drawing     
+        
+        
         self.last_point = None  # Store the last point for freehand drawing
         
         self.start_point = None  # Store the starting point for line and rectangle tools
@@ -87,7 +90,7 @@ class AnnotationCanvas(QWidget):
             
             painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap   
             
-            pen = QPen(Qt.GlobalColor.black, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style   
+            pen = QPen(self.brush_color, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style   
             
             painter.setPen(pen)  # Set the pen for drawing  
             
@@ -112,7 +115,7 @@ class AnnotationCanvas(QWidget):
             if (self.current_tool == "line" and self.start_point is not None and self.end_point is not None):
                 painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
                 
-                pen = QPen(Qt.GlobalColor.black, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style   
+                pen = QPen(self.brush_color, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style   
                 
                 painter.setPen(pen)  # Set the pen for drawing
                 
@@ -124,7 +127,7 @@ class AnnotationCanvas(QWidget):
             elif (self.current_tool == "rectangle" and self.start_point is not None and self.end_point is not None):
                 painter = QPainter(self.canvas)  # Create a painter to draw on the pixmap
                 
-                pen = QPen(Qt.GlobalColor.black, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style 
+                pen = QPen(self.brush_color, self.brush_size, self.brush_style)  # Create a pen with the current brush size and style 
                 
                 painter.setPen(pen)  # Set the pen for drawing
                 

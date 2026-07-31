@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup)
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup, QColorDialog)
 from annotation_canvas import AnnotationCanvas
 from PyQt6.QtCore import Qt
 
@@ -93,6 +93,9 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(color_label)
         
         self.color_button = QPushButton("Black")
+        
+        self.color_button.clicked.connect(self.choose_brush_color) 
+        
         control_layout.addWidget(self.color_button)
         
         #Create a label for the brush size control
@@ -161,5 +164,11 @@ class MainWindow(QMainWindow):
         elif style_name == "Dashed":
             self.canvas.brush_style = Qt.PenStyle.DashLine      
                 
-        
+    
+    def choose_brush_color(self):
+        """Open a color dialog to allow the user to select a brush color."""
+        color = QColorDialog.getColor(self.canvas.brush_color, self, "Choose Brush Color")
+        if color.isValid():
+            self.canvas.brush_color = color
+            self.color_button.setText(color.name())  # Update the button text to show the selected color    
         
