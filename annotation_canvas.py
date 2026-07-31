@@ -158,5 +158,14 @@ class AnnotationCanvas(QWidget):
         
         #Refresh the widget
         self.update()
+
+    def load_image(self, file_path):
+        """Load an image from the specified file path onto the canvas."""
+        
+        loaded_image = QPixmap(file_path)  # Load the image into a QPixmap
+        
+        if not loaded_image.isNull():  # Check if the image was loaded successfully
+            self.canvas = loaded_image.scaled(self.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)  # Scale the image to fit the canvas while maintaining aspect ratio
+            self.update()  # Refresh the widget to display the loaded image
         
             

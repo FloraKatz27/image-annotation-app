@@ -89,6 +89,14 @@ class MainWindow(QMainWindow):
         
         control_layout.addWidget(self.clear_button)
         
+        #Create a button for opening an image file and connecting it to the canvas's load method
+        self.open_image_button = QPushButton("Open Image")
+        
+        #Connect the button to the canvas's load method
+        self.open_image_button.clicked.connect(self.open_image)
+        
+        control_layout.addWidget(self.open_image_button)
+        
         #Create a button that lets the user choose where to save the canvas
         self.save_as_button = QPushButton("Save As")
         
@@ -207,6 +215,14 @@ class MainWindow(QMainWindow):
         """Clear all annotations from the canvas."""
         self.canvas.clear_canvas()
         
+    def open_image(self):
+        """Open a file dialog to allow the user to select an image file to load onto the canvas."""
+        file_path, selected_filter = QFileDialog.getOpenFileName(self, "Open Image", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+        
+        if file_path:
+            self.canvas.load_image(file_path)  # Load the selected image onto the canvas
+            self.statusBar().showMessage(f"Image opened from: {file_path}", 5000)  # Update the status bar to reflect the current state of the canvas
+        
     def save_canvas_as(self):
         """Open a file dialog to allow the user to save the canvas as an image file."""
         file_path, selected_filter = QFileDialog.getSaveFileName(self, "Save Annotated Image", "", "PNG Files (*.png);;JPEG Files (*.jpg *.jpeg)")
@@ -224,4 +240,7 @@ class MainWindow(QMainWindow):
         message = (f"Tool: {self.canvas.current_tool.capitalize()} | " f"Color: {self.canvas.brush_color.name()} | " f"Size: {self.canvas.brush_size} px")
         
         self.statusBar().showMessage(message)
+        
+        
+    
         
