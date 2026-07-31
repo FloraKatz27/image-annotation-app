@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QSpinBox, QComboBox, QButtonGroup, QColorDialog, QFileDialog)
 from annotation_canvas import AnnotationCanvas
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QShortcut, QKeySequence
+from PyQt6.QtGui import QShortcut, QKeySequence, QAction
 
 
 class MainWindow(QMainWindow):
@@ -59,7 +59,9 @@ class MainWindow(QMainWindow):
         self.new_canvas_button = QPushButton("New Canvas")
         
         #Explain the button and show its keyboard shortcut
-        self.new_canvas_button.setToolTip("Create a new blank canvas (Shortcut: Ctrl+N)")
+        self.new_canvas_button.setToolTip("Create a new blank canvas (Ctrl+N)")
+        
+        self.new_canvas_button.setToolTipDuration(5000)  # Show the tooltip for 5 seconds
                 
         #Connect it to the new canvas method
         self.new_canvas_button.clicked.connect(self.new_canvas)
@@ -71,6 +73,7 @@ class MainWindow(QMainWindow):
         
         #Explain the button and show its keyboard shortcut
         self.open_image_button.setToolTip("Open an image file (Shortcut: Ctrl+O)")
+        self.open_image_button.setToolTipDuration(5000)  # Show the tooltip for 5 seconds
                 
         #Connect the button to the canvas's load method
         self.open_image_button.clicked.connect(self.open_image)
@@ -82,6 +85,7 @@ class MainWindow(QMainWindow):
         
         #Explain the button and show its keyboard shortcut
         self.save_button.setToolTip("Save the current canvas (Shortcut: Ctrl+S)")
+        self.save_button.setToolTipDuration(5000)  # Show the tooltip for 5 seconds 
         
         #Connect the button to the save method
         self.save_button.clicked.connect(self.save_canvas)
@@ -92,7 +96,8 @@ class MainWindow(QMainWindow):
         self.save_as_button = QPushButton("Save As")
         
         #Explain the button and show its keyboard shortcut
-        self.save_as_button.setToolTip("Save the current canvas as a new file (Shortcut: Meta+Shift+S)")
+        self.save_as_button.setToolTip("Save the current canvas as a new file (Shortcut: Ctrl+Shift+S)")
+        self.save_as_button.setToolTipDuration(5000)  # Show the tooltip for 5 seconds
                 
         #Connect the button to the save method
         self.save_as_button.clicked.connect(self.save_canvas_as)
@@ -148,7 +153,8 @@ class MainWindow(QMainWindow):
         self.undo_button = QPushButton("Undo")
         
         #Explain the button and show its keyboard shortcut
-        self.undo_button.setToolTip("Undo the most recent annotation action (Shortcut: Ctrl+Z)")    
+        self.undo_button.setToolTip("Undo the most recent annotation action")
+        self.undo_button.setToolTipDuration(5000)  # Show the tooltip for 5 seconds
         #Connect it to the undo method
         self.undo_button.clicked.connect(self.undo)
                 
@@ -229,24 +235,21 @@ class MainWindow(QMainWindow):
         self.update_status_bar()
         
         #Create a new blank canvas when the application starts
-        self.new_shortcut = QShortcut(QKeySequence.StandardKey.New, self)
+        self.new_shortcut = QShortcut(QKeySequence("Ctrl+N"), self)
         self.new_shortcut.activated.connect(self.new_canvas)
         
         #Open an existing image
-        self.open_shortcut = QShortcut(QKeySequence.StandardKey.Open, self)
+        self.open_shortcut = QShortcut(QKeySequence("Ctrl+O"), self)
         self.open_shortcut.activated.connect(self.open_image)
         
         #Save using the current save path
-        self.save_shortcut = QShortcut(QKeySequence.StandardKey.Save, self)
+        self.save_shortcut = QShortcut(QKeySequence("Ctrl+S"), self)
         self.save_shortcut.activated.connect(self.save_canvas)
         
         #Open Save As dialog to choose a save location
-        self.save_as_shortcut = QShortcut(QKeySequence("Meta+Shift+S"), self)
+        self.save_as_shortcut = QShortcut(QKeySequence("Ctrl+Shift+S"), self)
         self.save_as_shortcut.activated.connect(self.save_canvas_as)
         
-        #Undo the most recent annotation action
-        self.undo_shortcut = QShortcut(QKeySequence.StandardKey.Undo, self)
-        self.undo_shortcut.activated.connect(self.undo)
         
     def select_freehand_tool(self):
         """Set the current tool in the canvas to freehand drawing."""
